@@ -1,159 +1,369 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dark Web Simulator Chat</title>
-<style>
-body {background:#121212;color:#0f0;font-family:monospace;margin:0;padding:0;}
-header{background:#1a1a1a;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
-.menu-btn{font-size:24px;cursor:pointer;}
-nav{display:none;flex-direction:column;background:#222;}
-nav a{color:#0f0;padding:10px;text-decoration:none;border-bottom:1px solid #333;}
-nav a:hover{background:#333;}
-.container{padding:20px;}
-input, textarea{display:block;margin:10px auto;padding:10px;width:80%;max-width:400px;background:#222;color:#0f0;border:1px solid #0f0;border-radius:5px;}
-button.btn{background:#333;color:#0f0;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;margin:5px;}
-button.btn:hover{background:#444;}
-ul{list-style:none;padding:0;max-width:600px;margin:auto;}
-li{margin:10px 0;display:flex;align-items:flex-start;}
-li img{border-radius:50%;margin-right:10px;width:40px;height:40px;}
-@media(min-width:600px){nav{display:flex !important;flex-direction:row;} nav a{border-bottom:none;margin-right:10px;}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dark Web Simulator</title>
+  <style>
+    :root {
+      --bg:#0b0e16; --card:#121624; --panel:#0f1322; --text:#e7e9ff; --muted:#9aa3c7;
+      --acc:#00ff9a; --line:#233055; --btn:#5865F2; --btnh:#4752C4;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100dvh; color:var(--text);
+      background: radial-gradient(80vw 80vh at 5% 10%, #0e1330 0, transparent 60%),
+                  radial-gradient(60vw 60vh at 95% 90%, #12183a 0, transparent 60%),
+                  var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans Thai", sans-serif;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      background:linear-gradient(180deg,#0e1325,#0c1020);
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 16px;
+    }
+    .brand{display:flex;align-items:center;gap:10px}
+    .dot{width:10px;height:10px;border-radius:50%; background:var(--acc); box-shadow:0 0 12px var(--acc)}
+    .menu-btn{font-size:22px; cursor:pointer; user-select:none}
+    nav{display:none; background:var(--panel); border-bottom:1px solid var(--line)}
+    nav a{display:block; padding:12px 16px; text-decoration:none; color:var(--text); border-top:1px solid #0c1226}
+    nav a:hover{background:#121a35}
+    @media(min-width:720px){
+      nav{display:flex !important; gap:8px; border:0; background:transparent; padding-right:8px}
+      nav a{border:1px solid var(--line); border-radius:10px}
+      .menu-btn{display:none}
+    }
+    .container{max-width:980px; margin:18px auto; padding:0 16px}
+    .card{
+      background:linear-gradient(180deg,#151a2f,#11162b);
+      border:1px solid var(--line); border-radius:16px; padding:18px;
+      box-shadow:0 10px 40px rgba(0,0,0,.35);
+    }
+    .row{display:flex; align-items:center; gap:14px}
+    .grow{flex:1}
+    h1{margin:6px 0 4px; font-size:1.35rem}
+    p{margin:0; color:var(--muted)}
+    .actions{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap}
+    button,.btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      border:0; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+      background:var(--btn); color:#fff; text-decoration:none
+    }
+    button:hover,.btn:hover{background:var(--btnh)}
+    .hidden{display:none !important}
+    .panel{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px}
+    .kv{font-size:.95rem}
+    .kv div{display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px dashed #253061}
+    .kv div:last-child{border-bottom:0}
+    .avatar{width:60px;height:60px;border-radius:50%; border:1px solid #2c366b}
+    /* chat */
+    .chat-wrap{display:flex; flex-direction:column; gap:12px}
+    .chat-inputs{display:flex; flex-wrap:wrap; gap:8px}
+    .chat-inputs input{
+      flex:1 1 220px; min-width:200px; padding:10px 12px; border-radius:10px;
+      border:1px solid var(--line); background:#121733; color:#cfe7ff
+    }
+    .chat-list{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px}
+    .msg{display:flex; gap:10px; align-items:flex-start; background:#0f142c; border:1px solid #1e2a55; padding:10px; border-radius:12px}
+    .msg .meta{font-size:.85rem; color:#9fb0d5}
+    .msg .content img{max-width:220px; border-radius:8px; border:1px solid #29356b; margin-top:6px}
+    .timer{font-size:.9rem; color:#9fb0d5}
+    /* fake .onion bar */
+    .onion{
+      display:flex; align-items:center; gap:8px; font-family:monospace;
+      background:#0d132b; border:1px dashed #2a3b73; color:#9bd7ba; padding:8px 12px; border-radius:10px;
+      box-shadow:inset 0 0 12px rgba(0,255,154,.06)
+    }
+    .tag{padding:2px 6px; border-radius:6px; font-size:.8rem; background:#12233a; border:1px solid #264a7a; color:#a8c7ff}
+  </style>
 </head>
 <body>
+  <header>
+    <div class="brand">
+      <span class="dot"></span>
+      <strong>Dark Web Simulator</strong>
+    </div>
+    <div class="menu-btn" id="menuBtn">☰</div>
+    <nav id="menu">
+      <a href="#" data-page="home">หน้าแรก</a>
+      <a href="#" data-page="chat">แชท</a>
+      <a href="#" data-page="ads">โฆษณา</a>
+      <a href="#" data-page="news">ประกาศข่าว</a>
+    </nav>
+  </header>
 
-<header>
-  <div>Dark Web Simulator</div>
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
-</header>
-<nav id="menu">
-  <a href="#" onclick="showPage('home')">หน้าแรก</a>
-  <a href="#" onclick="showPage('chat')">แชท</a>
-  <a href="#" onclick="showPage('ads')">โฆษณา</a>
-  <a href="#" onclick="showPage('news')">ประกาศข่าว</a>
-</nav>
+  <div class="container">
+    <!-- Fake .onion bar -->
+    <div class="onion panel" style="margin-bottom:14px">
+      <span class="tag">tor://</span>
+      <span id="onionAddr"></span>
+      <span class="tag" id="torState">SIM MODE</span>
+      <a class="btn" id="regenOnion" style="margin-left:auto">สุ่มที่อยู่</a>
+    </div>
 
-<div id="home" class="container">
-  <h1>หน้าแรก</h1>
-  <p>ยินดีต้อนรับสู่ Dark Web Simulator</p>
-  <button class="btn" id="discordLoginBtn">Login with Discord</button>
-  <div id="discordProfile"></div>
-</div>
+    <!-- HOME -->
+    <section id="page-home" class="card">
+      <div class="row">
+        <img id="pfp" class="avatar" src="" alt="">
+        <div class="grow">
+          <h1 id="title">ยินดีต้อนรับ</h1>
+          <p id="subtitle">นี่คือ Dark Web แบบจำลองเพื่อการศึกษาเท่านั้น</p>
+        </div>
+      </div>
+      <div class="actions" id="loggedOut">
+        <a class="btn" id="discordLoginBtn">Login with Discord</a>
+      </div>
+      <div id="loggedIn" class="hidden">
+        <div class="kv panel">
+          <div><span>ชื่อผู้ใช้</span><span id="uname">-</span></div>
+          <div><span>Discord ID</span><span id="uid">-</span></div>
+          <div><span>Email</span><span id="uemail">-</span></div>
+        </div>
+        <div class="actions">
+          <button id="copyBtn">📋 คัดลอก Access Token</button>
+          <button id="logoutBtn">🚪 ออกจากระบบ</button>
+        </div>
+      </div>
+    </section>
 
-<div id="chat" class="container" style="display:none;">
-  <h1>แชท</h1>
-  <ul id="chatList"></ul>
-  <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ...">
-  <input type="text" id="chatImage" placeholder="ใส่ URL รูป (optional)">
-  <button class="btn" onclick="sendChat()">ส่งข้อความ</button>
-</div>
+    <!-- CHAT -->
+    <section id="page-chat" class="card hidden">
+      <h1>แชท</h1>
+      <p class="timer">ห้องแชทจะรีเซ็ตอัตโนมัติใน <span id="resetCountdown">--:--:--</span></p>
+      <div class="chat-wrap">
+        <ul class="chat-list" id="chatList"></ul>
+        <div class="chat-inputs">
+          <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ...">
+          <input type="url" id="chatImage" placeholder="วางลิงก์รูปภาพ (ไม่บังคับ)">
+          <button class="btn" id="sendBtn">ส่งข้อความ</button>
+        </div>
+      </div>
+      <p style="color:#8fb6ff; margin-top:10px">* ต้องล็อกอิน Discord ก่อนจึงจะส่งข้อความ/รูปได้</p>
+    </section>
 
-<div id="ads" class="container" style="display:none;">
-  <h1>โฆษณา</h1>
-  <ul id="adsList"></ul>
-</div>
+    <!-- ADS -->
+    <section id="page-ads" class="card hidden">
+      <h1>โฆษณา</h1>
+      <div class="panel">
+        <ul id="adsList" style="margin:0; padding-left:18px;"></ul>
+      </div>
+    </section>
 
-<div id="news" class="container" style="display:none;">
-  <h1>ประกาศข่าว</h1>
-  <ul id="newsList"></ul>
-</div>
+    <!-- NEWS -->
+    <section id="page-news" class="card hidden">
+      <h1>ประกาศข่าว</h1>
+      <div class="panel">
+        <ul id="newsList" style="margin:0; padding-left:18px;"></ul>
+      </div>
+    </section>
+  </div>
 
 <script>
-function toggleMenu(){const menu=document.getElementById('menu');menu.style.display=(menu.style.display==='flex')?'none':'flex';}
+/** ================== CONFIG ================== */
+const CLIENT_ID = "1340250311851380736"; // <— ใส่ Client ID ของคุณ (อันนี้ตามที่คุณให้มา)
+const SCOPES = ["identify","email"];
+const DISCORD_API = "https://discord.com/api";
+const REDIRECT_URI = window.location.origin + window.location.pathname; // ต้องเพิ่มค่าเดียวกันใน Developer Portal
+
+/** ================== NAV / UI ================== */
+const $ = (id)=>document.getElementById(id);
+const pages = ["home","chat","ads","news"];
+$("menuBtn").onclick = () => {
+  const menu = $("menu");
+  menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+};
+Array.from(document.querySelectorAll('nav a[data-page]')).forEach(a=>{
+  a.addEventListener('click',(e)=>{
+    e.preventDefault();
+    showPage(a.dataset.page);
+    $("menu").style.display='none';
+  });
+});
 function showPage(page){
-  ['home','chat','ads','news'].forEach(p=>document.getElementById(p).style.display=(p===page)?'block':'none');
-  document.getElementById('menu').style.display='none';
+  pages.forEach(p => {
+    const el = $("page-"+p);
+    if(!el) return;
+    el.classList.toggle("hidden", p!==page);
+  });
 }
 
-// Discord Login
-const CLIENT_ID='1407050845727756329';
-const REDIRECT_URI=window.location.origin+window.location.pathname;
-let currentUser=null;
+/** ================== Fake .onion address (SIM) ================== */
+function randStr(n){ const chars="abcdefghijklmnopqrstuvwxyz234567"; let s=""; for(let i=0;i<n;i++) s+=chars[Math.floor(Math.random()*chars.length)]; return s; }
+function genOnion(){ return randStr(16)+".onion"; }
+function setOnion(){ $("onionAddr").textContent = genOnion(); }
+$("regenOnion").onclick = setOnion;
+setOnion();
 
+/** ================== DISCORD LOGIN (Implicit Grant) ================== */
 function loginDiscord(){
-  const url=`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
-  window.location.href=url;
-}
-
-document.getElementById('discordLoginBtn').onclick = loginDiscord;
-
-// Chat
-const chatList=document.getElementById('chatList');
-
-function loadChat(){
-  chatList.innerHTML='';
-  const messages=JSON.parse(localStorage.getItem('chatMessages')||'[]');
-  messages.forEach(m=>{
-    const li=document.createElement('li');
-    const img=document.createElement('img'); img.src=m.avatar;
-    li.appendChild(img);
-    const span=document.createElement('span');
-    span.innerHTML=`<b>${m.username}</b>: ${m.text}`;
-    if(m.image) span.innerHTML+=`<br><img src="${m.image}" width="100">`;
-    li.appendChild(span);
-    chatList.appendChild(li);
+  const params = new URLSearchParams({
+    client_id: CLIENT_ID,
+    response_type: "token",
+    redirect_uri: REDIRECT_URI,
+    scope: SCOPES.join(" ")
   });
+  location.assign(`${DISCORD_API}/oauth2/authorize?${params.toString()}`);
+}
+$("discordLoginBtn").onclick = loginDiscord;
+
+async function fetchMe(token){
+  const res = await fetch(`${DISCORD_API}/users/@me`, { headers:{Authorization:`Bearer ${token}`}});
+  if(!res.ok) throw new Error("user fetch failed");
+  return await res.json();
 }
 
-function sendChat(){
-  if(!currentUser){alert('ต้องล็อกอิน Discord ก่อน'); return;}
-  const input=document.getElementById('chatInput');
-  const imgInput=document.getElementById('chatImage');
-  const text=input.value.trim();
-  const image=imgInput.value.trim();
-  if(!text && !image) return;
-  const messages=JSON.parse(localStorage.getItem('chatMessages')||'[]');
-  messages.push({
-    username:currentUser.username+'#'+currentUser.discriminator,
-    avatar:`https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`,
-    text:text,
-    image:image,
-    timestamp:Date.now()
+function setLoggedOut(){
+  $("loggedOut").classList.remove("hidden");
+  $("loggedIn").classList.add("hidden");
+  $("title").textContent = "ยินดีต้อนรับ";
+  $("subtitle").textContent = "นี่คือ Dark Web แบบจำลองเพื่อการศึกษาเท่านั้น";
+  $("pfp").src = "";
+}
+
+function setLoggedIn(user, token){
+  $("loggedOut").classList.add("hidden");
+  $("loggedIn").classList.remove("hidden");
+  $("title").textContent = `ยินดีต้อนรับ ${user.username}`;
+  $("subtitle").textContent = `${user.username}#${user.discriminator}`;
+  $("uname").textContent = `${user.username}#${user.discriminator}`;
+  $("uid").textContent = user.id;
+  $("uemail").textContent = user.email || "(ไม่ได้ให้สิทธิ์ email)";
+  const avatarUrl = user.avatar
+    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
+    : `https://cdn.discordapp.com/embed/avatars/${Number(user.discriminator)%5}.png`;
+  $("pfp").src = avatarUrl;
+
+  $("copyBtn").onclick = async () => {
+    await navigator.clipboard.writeText(token);
+    alert("คัดลอกโทเค็นแล้ว");
+  };
+}
+
+function logout(){
+  sessionStorage.removeItem("d_access_token");
+  setLoggedOut();
+}
+
+/** ================== CHAT (24h retention) ================== */
+const CHAT_KEY = "dw_chat_messages";
+const RESET_KEY = "dw_chat_last_reset";
+const DAY_MS = 24*60*60*1000;
+
+function now(){ return Date.now(); }
+function ensureWindow(){
+  let last = parseInt(localStorage.getItem(RESET_KEY) || "0",10);
+  if(!last || (now()-last)>=DAY_MS){
+    localStorage.setItem(CHAT_KEY,"[]");
+    localStorage.setItem(RESET_KEY, String(now()));
+    last = now();
+  }
+  return last;
+}
+function timeLeftStr(last){
+  const remain = Math.max(0, (last+DAY_MS) - now());
+  const hh = String(Math.floor(remain/3600000)).padStart(2,'0');
+  const mm = String(Math.floor((remain%3600000)/60000)).padStart(2,'0');
+  const ss = String(Math.floor((remain%60000)/1000)).padStart(2,'0');
+  return `${hh}:${mm}:${ss}`;
+}
+function tickCountdown(){
+  const last = parseInt(localStorage.getItem(RESET_KEY) || "0",10) || ensureWindow();
+  $("resetCountdown").textContent = timeLeftStr(last);
+  if((now()-last)>=DAY_MS){ ensureWindow(); renderChat(); }
+  requestAnimationFrame(()=>setTimeout(tickCountdown, 500));
+}
+
+function getMessages(){
+  ensureWindow();
+  try { return JSON.parse(localStorage.getItem(CHAT_KEY) || "[]"); }
+  catch{ return []; }
+}
+function saveMessages(arr){
+  localStorage.setItem(CHAT_KEY, JSON.stringify(arr));
+}
+
+function renderChat(){
+  const ul = $("chatList");
+  ul.innerHTML = "";
+  const msgs = getMessages();
+  for(const m of msgs){
+    const li = document.createElement("li"); li.className="msg";
+    const img = document.createElement("img"); img.className="avatar"; img.src = m.avatar;
+    const content = document.createElement("div"); content.className="content";
+    const meta = document.createElement("div"); meta.className="meta";
+    meta.textContent = `${m.username} • ${new Date(m.timestamp).toLocaleString()}`;
+    const text = document.createElement("div"); text.textContent = m.text || "";
+    content.appendChild(meta);
+    if(m.text) content.appendChild(text);
+    if(m.image){
+      const pic = document.createElement("img"); pic.src = m.image;
+      content.appendChild(pic);
+    }
+    li.appendChild(img); li.appendChild(content);
+    ul.appendChild(li);
+  }
+}
+
+let currentUser = null; // set after login
+
+function sendMessage(){
+  if(!currentUser){ alert("ต้องล็อกอิน Discord ก่อน"); return; }
+  const t = $("chatInput").value.trim();
+  const u = $("chatImage").value.trim();
+  if(!t && !u) return;
+  const msgs = getMessages();
+  msgs.push({
+    username: `${currentUser.username}#${currentUser.discriminator}`,
+    avatar: currentUser.avatar
+      ? `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`
+      : `https://cdn.discordapp.com/embed/avatars/${Number(currentUser.discriminator)%5}.png`,
+    text: t, image: u, timestamp: now()
   });
-  localStorage.setItem('chatMessages',JSON.stringify(messages));
-  input.value=''; imgInput.value='';
-  loadChat();
+  saveMessages(msgs);
+  $("chatInput").value = "";
+  $("chatImage").value = "";
+  renderChat();
 }
+$("sendBtn").onclick = sendMessage;
 
-// Ads / News
-const ads=["โฆษณา A","โฆษณา B","โฆษณา C"];
-const adsList=document.getElementById('adsList');
-ads.forEach(a=>{const li=document.createElement('li');li.textContent=a;adsList.appendChild(li);});
-const news=["ข่าว 1","ข่าว 2","ข่าว 3"];
-const newsList=document.getElementById('newsList');
-news.forEach(n=>{const li=document.createElement('li');li.textContent=n;newsList.appendChild(li);});
+/** ================== BOOT ================== */
+$("logoutBtn").onclick = logout;
 
-// โหลด token จาก URL hash
-window.onload=function(){
-  if(window.location.hash){
-    const params=new URLSearchParams(window.location.hash.slice(1));
-    const token=params.get('access_token');
+// หน้าหลักตอนเริ่ม
+showPage("home");
+setLoggedOut();
+ensureWindow();
+renderChat();
+tickCountdown();
+
+// โยน token จาก hash → sessionStorage แล้วเคลียร์ hash
+(function handleHashToken(){
+  if(location.hash){
+    const params = new URLSearchParams(location.hash.substring(1));
+    const token = params.get("access_token");
     if(token){
-      fetch('https://discord.com/api/users/@me',{
-        headers:{Authorization:'Bearer '+token}
-      })
-      .then(res=>res.json())
-      .then(user=>{
-        currentUser=user;
-        const profile=document.getElementById('discordProfile');
-        profile.innerHTML=`<p>Logged in as ${user.username}#${user.discriminator}</p>
-        <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" width="100">`;
-        loadChat();
-      });
+      sessionStorage.setItem("d_access_token", token);
+      // ใช้ replaceState เพื่อเคลียร์ hash แต่คง path เดิม (สำคัญสำหรับ GitHub Pages subpath)
+      history.replaceState({}, "", REDIRECT_URI);
     }
   }
+})();
 
-  // รีเซ็ต chat ทุก 24 ชม.
-  const lastReset=localStorage.getItem('chatLastReset');
-  const now=Date.now();
-  if(!lastReset || now-parseInt(lastReset)>24*60*60*1000){
-    localStorage.setItem('chatMessages','[]');
-    localStorage.setItem('chatLastReset',now.toString());
+// ถ้ามี token อยู่แล้ว → ดึงโปรไฟล์และตั้งค่า UI
+(async ()=>{
+  const token = sessionStorage.getItem("d_access_token");
+  if(token){
+    try{
+      const me = await fetchMe(token);
+      currentUser = me;
+      setLoggedIn(me, token);
+    }catch{
+      logout();
+    }
   }
-
-  loadChat();
-}
+})();
 </script>
 </body>
 </html>
