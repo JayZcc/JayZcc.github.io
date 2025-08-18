@@ -1,124 +1,159 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Popcat Online</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark Web Simulator Chat</title>
 <style>
-body{margin:0;font-family:sans-serif;background:#6a0dad;color:white;text-align:center;}
-h1{margin:20px 0;}
-.score{font-size:2em;margin-bottom:10px;}
-img{width:220px;cursor:pointer;user-select:none;-webkit-user-drag:none;touch-action: manipulation;transition:0.1s;}
-img:active{transform:scale(0.95);}
-select{margin:10px;padding:6px 10px;border-radius:6px;font-size:16px;}
-table{border-collapse:collapse;width:90%;max-width:600px;margin:20px auto;background:#fff;color:#222;border-radius:8px;overflow:hidden;}
-th,td{padding:10px 14px;text-align:left;}
-th{background:#eee;}
-tr:nth-child(even){background:#fafafa;}
-.country{display:flex;align-items:center;gap:8px;}
-.country img{width:24px;height:16px;object-fit:cover;}
+body {background:#121212;color:#0f0;font-family:monospace;margin:0;padding:0;}
+header{background:#1a1a1a;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
+.menu-btn{font-size:24px;cursor:pointer;}
+nav{display:none;flex-direction:column;background:#222;}
+nav a{color:#0f0;padding:10px;text-decoration:none;border-bottom:1px solid #333;}
+nav a:hover{background:#333;}
+.container{padding:20px;}
+input, textarea{display:block;margin:10px auto;padding:10px;width:80%;max-width:400px;background:#222;color:#0f0;border:1px solid #0f0;border-radius:5px;}
+button.btn{background:#333;color:#0f0;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;margin:5px;}
+button.btn:hover{background:#444;}
+ul{list-style:none;padding:0;max-width:600px;margin:auto;}
+li{margin:10px 0;display:flex;align-items:flex-start;}
+li img{border-radius:50%;margin-right:10px;width:40px;height:40px;}
+@media(min-width:600px){nav{display:flex !important;flex-direction:row;} nav a{border-bottom:none;margin-right:10px;}}
 </style>
 </head>
 <body>
 
-<h1>⚔️ POPCAT 🇹🇭 VS 🇰🇭 🗡️</h1>
-<div>เลือกประเทศของคุณ | ជ្រើសរើសប្រទេសរបស់អ្នក:</div>
-<select id="countrySelect">
-  <option value="">🇹🇭🇰🇭?????</option>
-  <option value="Thailand🇹🇭">🇹🇭 ไทย / Thailand</option>
-  <option value="Cambodia🇰🇭">🇰🇭 កម្ពុជា / Cambodia</option>
-</select>
+<header>
+  <div>Dark Web Simulator</div>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</header>
+<nav id="menu">
+  <a href="#" onclick="showPage('home')">หน้าแรก</a>
+  <a href="#" onclick="showPage('chat')">แชท</a>
+  <a href="#" onclick="showPage('ads')">โฆษณา</a>
+  <a href="#" onclick="showPage('news')">ประกาศข่าว</a>
+</nav>
 
-<div class="score">คะแนน / ពិន្ទុ: 0</div>
-<img id="cat" src="images/cat_closed.png" alt="Pop Cat">
-<audio id="sound" src="https://www.myinstants.com/media/sounds/pop-cat-original.mp3"></audio>
-<audio id="bgMusic" src="https://www.example.com/เพลงของคุณ.mp3" loop autoplay></audio>
+<div id="home" class="container">
+  <h1>หน้าแรก</h1>
+  <p>ยินดีต้อนรับสู่ Dark Web Simulator</p>
+  <button class="btn" id="discordLoginBtn">Login with Discord</button>
+  <div id="discordProfile"></div>
+</div>
 
-<h2>🌍 คะแนนประเทศ / ពិន្ទុជាតិក្នុងប្រទេស</h2>
-<table id="leaderboard">
-<thead><tr><th>#</th><th>ประเทศ / ប្រទេស</th><th>คะแนนรวม / ពិន្ទុសរុប</th></tr></thead>
-<tbody></tbody>
-</table>
+<div id="chat" class="container" style="display:none;">
+  <h1>แชท</h1>
+  <ul id="chatList"></ul>
+  <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ...">
+  <input type="text" id="chatImage" placeholder="ใส่ URL รูป (optional)">
+  <button class="btn" onclick="sendChat()">ส่งข้อความ</button>
+</div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<div id="ads" class="container" style="display:none;">
+  <h1>โฆษณา</h1>
+  <ul id="adsList"></ul>
+</div>
+
+<div id="news" class="container" style="display:none;">
+  <h1>ประกาศข่าว</h1>
+  <ul id="newsList"></ul>
+</div>
 
 <script>
-// Firebase Config
-const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
-};
+function toggleMenu(){const menu=document.getElementById('menu');menu.style.display=(menu.style.display==='flex')?'none':'flex';}
+function showPage(page){
+  ['home','chat','ads','news'].forEach(p=>document.getElementById(p).style.display=(p===page)?'block':'none');
+  document.getElementById('menu').style.display='none';
+}
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// Discord Login
+const CLIENT_ID='1407050845727756329';
+const REDIRECT_URI=window.location.origin+window.location.pathname;
+let currentUser=null;
 
-// Elements
-const cat = document.getElementById("cat");
-const scoreEl = document.querySelector(".score");
-const sound = document.getElementById("sound");
-const bgMusic = document.getElementById("bgMusic");
-const countrySelect = document.getElementById("countrySelect");
-const tbody = document.querySelector("#leaderboard tbody");
+function loginDiscord(){
+  const url=`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+  window.location.href=url;
+}
 
-// เล่นเพลงพื้นหลัง
-bgMusic.volume = 0.3;
-bgMusic.play().catch(()=>{});
+document.getElementById('discordLoginBtn').onclick = loginDiscord;
 
-// คะแนนส่วนตัว
-let myScore = localStorage.getItem("myScore") ? parseInt(localStorage.getItem("myScore")) : 0;
-scoreEl.textContent = "คะแนน / ពិន្ទុ: " + myScore;
+// Chat
+const chatList=document.getElementById('chatList');
 
-let open = false;
-
-// ฟังก์ชันอัปเดตตาราง
-function updateTable(countries){
-  let entries = Object.entries(countries);
-  entries.sort((a,b)=>b[1]-a[1]);
-  tbody.innerHTML = "";
-  entries.forEach((item,idx)=>{
-    let tr = document.createElement("tr");
-    tr.innerHTML = `<td>${idx+1}</td><td class="country">${item[0]}</td><td>${item[1]}</td>`;
-    tbody.appendChild(tr);
+function loadChat(){
+  chatList.innerHTML='';
+  const messages=JSON.parse(localStorage.getItem('chatMessages')||'[]');
+  messages.forEach(m=>{
+    const li=document.createElement('li');
+    const img=document.createElement('img'); img.src=m.avatar;
+    li.appendChild(img);
+    const span=document.createElement('span');
+    span.innerHTML=`<b>${m.username}</b>: ${m.text}`;
+    if(m.image) span.innerHTML+=`<br><img src="${m.image}" width="100">`;
+    li.appendChild(span);
+    chatList.appendChild(li);
   });
 }
 
-// ฟังข้อมูล realtime
-db.ref('countries').on('value', snapshot=>{
-  let countries = snapshot.val() || {"Thailand🇹🇭":0,"Cambodia🇰🇭":0};
-  updateTable(countries);
-});
+function sendChat(){
+  if(!currentUser){alert('ต้องล็อกอิน Discord ก่อน'); return;}
+  const input=document.getElementById('chatInput');
+  const imgInput=document.getElementById('chatImage');
+  const text=input.value.trim();
+  const image=imgInput.value.trim();
+  if(!text && !image) return;
+  const messages=JSON.parse(localStorage.getItem('chatMessages')||'[]');
+  messages.push({
+    username:currentUser.username+'#'+currentUser.discriminator,
+    avatar:`https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`,
+    text:text,
+    image:image,
+    timestamp:Date.now()
+  });
+  localStorage.setItem('chatMessages',JSON.stringify(messages));
+  input.value=''; imgInput.value='';
+  loadChat();
+}
 
-// กด Popcat
-cat.addEventListener("click", ()=>{
-  const c = countrySelect.value;
-  if(!c){ alert("กรุณาเลือกประเทศ / សូមជ្រើសប្រទេសរបស់អ្នក!"); return; }
+// Ads / News
+const ads=["โฆษณา A","โฆษณา B","โฆษณา C"];
+const adsList=document.getElementById('adsList');
+ads.forEach(a=>{const li=document.createElement('li');li.textContent=a;adsList.appendChild(li);});
+const news=["ข่าว 1","ข่าว 2","ข่าว 3"];
+const newsList=document.getElementById('newsList');
+news.forEach(n=>{const li=document.createElement('li');li.textContent=n;newsList.appendChild(li);});
 
-  // เพิ่มคะแนนส่วนตัว
-  myScore++;
-  localStorage.setItem("myScore", myScore);
-  scoreEl.textContent = "คะแนน / ពិន្ទុ: " + myScore;
-
-  // เล่นเสียง
-  sound.currentTime = 0; sound.play();
-
-  // เพิ่มคะแนนประเทศออนไลน์แบบเรียลไทม์
-  const countryRef = db.ref('countries/' + c);
-  countryRef.transaction(current => (current || 0) + 1);
-
-  // แสดง animation Popcat เปิด-ปิด
-  if(!open){
-    cat.src = "images/cat_open.png";
-    open = true;
-    setTimeout(()=>{cat.src="images/cat_closed.png";open=false;},150);
+// โหลด token จาก URL hash
+window.onload=function(){
+  if(window.location.hash){
+    const params=new URLSearchParams(window.location.hash.slice(1));
+    const token=params.get('access_token');
+    if(token){
+      fetch('https://discord.com/api/users/@me',{
+        headers:{Authorization:'Bearer '+token}
+      })
+      .then(res=>res.json())
+      .then(user=>{
+        currentUser=user;
+        const profile=document.getElementById('discordProfile');
+        profile.innerHTML=`<p>Logged in as ${user.username}#${user.discriminator}</p>
+        <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" width="100">`;
+        loadChat();
+      });
+    }
   }
-});
+
+  // รีเซ็ต chat ทุก 24 ชม.
+  const lastReset=localStorage.getItem('chatLastReset');
+  const now=Date.now();
+  if(!lastReset || now-parseInt(lastReset)>24*60*60*1000){
+    localStorage.setItem('chatMessages','[]');
+    localStorage.setItem('chatLastReset',now.toString());
+  }
+
+  loadChat();
+}
 </script>
 </body>
 </html>
