@@ -2,137 +2,114 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>Popcat Battle TH vs KH</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ซื้อยศ Discord</title>
   <style>
-    body { background:#0f1222; color:#fff; font-family:sans-serif; text-align:center; margin:0; }
-    header { background:#151a2f; padding:10px; display:flex; justify-content:space-between; align-items:center; }
-    header h1 { margin:0; font-size:1.5em; }
-    header nav select { padding:5px; font-size:1em; }
-    #news { background:#222633; padding:10px; margin:0; font-size:1em; }
-    #cat { width:250px; cursor:pointer; transition:transform .08s; margin-top:20px; }
-    #cat.pop { transform:scale(0.95); }
-    #score { font-size:1.5em; margin:20px; }
-    #board { display:flex; justify-content:center; gap:50px; margin-top:30px; }
-    .country { background:#151a2f; padding:15px; border-radius:10px; width:200px; }
-    .country h2 { margin:0 0 10px; }
-    .country span { font-size:2em; display:block; }
-    #winner { margin-top:30px; font-size:2em; color:yellow; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #4b6cb7, #182848);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 {
+      margin: 20px 0;
+      font-size: 2rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    select, input {
+      padding: 12px;
+      border-radius: 5px;
+      border: none;
+      width: 100%;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+    button {
+      padding: 12px;
+      width: 100%;
+      background-color: #7289da;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      margin-top: 15px;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #5b6eae;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🐱 Popcat Battle</h1>
-    <nav>
-      <select id="country">
-        <option value="th">🇹🇭 ไทย</option>
-        <option value="kh">🇰🇭 เขมร</option>
-      </select>
-    </nav>
-  </header>
+  <h1>ซื้อยศ Discord</h1>
 
-  <div id="news">📰 ข่าวสาร: ยินดีต้อนรับสู่ Popcat Battle!</div>
-
-  <div id="score">คุณกดไปแล้ว: <span id="myscore">0</span></div>
-  <img id="cat" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Cat_close_up.png">
-
-  <div id="board">
-    <div class="country">
-      <h2>🇹🇭 ไทย</h2>
-      <span id="thscore">0</span>
-    </div>
-    <div class="country">
-      <h2>🇰🇭 เขมร</h2>
-      <span id="khscore">0</span>
-    </div>
+  <div class="card">
+    <h2>เลือกยศ</h2>
+    <select id="roleSelect">
+      <option value="VIP 1">⭐ VIP 1 - 130 บาท</option>
+		 <option value="VIP 2">⭐ VIP 2- 50 บาท</option>
+		 <option value="VIP 3">⭐ VIP 3- 77 บาท</option>
+		 <option value="PRO 1">⭐ PRO 1 - 99 บาท</option>
+		 <option value="PRO 2">⭐ PRO 1- 159 บาท</option>
+      <option value="VIP PRO 100">🛡️ MOD - 299 บาท</option>
+      <option value="ADMIN">👑 ADMIN - 499 บาท</option>
+    </select>
+    <input type="text" id="discordId" placeholder="ใส่ @ ชื่อดิส คุณ">
+    <button onclick="buyRole()">ซื้อยศ</button>
   </div>
 
-  <div id="winner"></div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
   <script>
-    // 🔧 ใส่ Firebase config ของคุณตรงนี้
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const scoresRef = db.ref("countryScores");
-    const newsRef = db.ref("news");
-
-    let userId = localStorage.getItem("popcatUser");
-    if(!userId){
-      userId = "u"+Math.random().toString(36).substr(2,9);
-      localStorage.setItem("popcatUser", userId);
+    // ฟังก์ชันสุ่มเลขออเดอร์ (6 หลัก)
+    function generateOrderNumber() {
+      return Math.floor(100000 + Math.random() * 900000);
     }
 
-    const cat = document.getElementById("cat");
-    const myscoreEl = document.getElementById("myscore");
-    const thEl = document.getElementById("thscore");
-    const khEl = document.getElementById("khscore");
-    const countrySelect = document.getElementById("country");
-    const winnerEl = document.getElementById("winner");
-    const newsEl = document.getElementById("news");
+    async function buyRole() {
+      const role = document.getElementById('roleSelect').value;
+      const discordId = document.getElementById('discordId').value.trim();
 
-    let myScore = 0;
-    let country = localStorage.getItem("popcatCountry") || "th";
-    countrySelect.value = country;
-
-    countrySelect.addEventListener("change", ()=>{
-      country = countrySelect.value;
-      localStorage.setItem("popcatCountry", country);
-    });
-
-    const MAX_SCORE = 1000000000000; // 1,000,000,000,000
-
-    // คะแนน realtime
-    scoresRef.on("value", snap=>{
-      const data = snap.val() || {th:0, kh:0};
-      thEl.textContent = data.th || 0;
-      khEl.textContent = data.kh || 0;
-
-      if((data.th||0) >= MAX_SCORE){
-        winnerEl.textContent = "🇹🇭 ประเทศไทย ชนะ! 🏆";
-        cat.style.pointerEvents = "none";
-      } else if((data.kh||0) >= MAX_SCORE){
-        winnerEl.textContent = "🇰🇭 ประเทศกัมพูชา ชนะ! 🏆";
-        cat.style.pointerEvents = "none";
-      } else {
-        winnerEl.textContent = "";
-        cat.style.pointerEvents = "auto";
+      if (!discordId) {
+        alert('กรุณาใส่ Discord ID ของคุณ');
+        return;
       }
-    });
 
-    // ข่าวสาร realtime
-    newsRef.on("value", snap=>{
-      const txt = snap.val() || "📰 ข่าวสาร: ยินดีต้อนรับสู่ Popcat Battle!";
-      newsEl.textContent = txt;
-    });
+      // ✅ ใส่ Webhook ของคุณตรงนี้
+      const webhookURL = "https://discord.com/api/webhooks/1408036982017495050/aB8jhBAH15_TEhVnRksxuc0Hvljerzgnfn7OJoA3voJJQ5ogXty9r_Eeiif-SnBh8nIY";
 
-    // กดแมว
-    cat.addEventListener("click", ()=>{
-      myScore++;
-      myscoreEl.textContent = myScore;
+      const orderNumber = generateOrderNumber();
 
-      cat.classList.add("pop");
-      setTimeout(()=>cat.classList.remove("pop"),80);
+      const payload = {
+        content: `🛒 **คำสั่งซื้อใหม่**\n👤 ลูกค้า: ${discordId}\n🎖️ ยศที่ซื้อ: ${role}\n📦 เลขสินค้า: #${orderNumber}`
+      };
 
-      // อัปเดตคะแนน
-      scoresRef.child(country).transaction(val=>{
-        if(!val) val = 0;
-        return val >= MAX_SCORE ? MAX_SCORE : val+1;
-      });
-    });
+      try {
+        const response = await fetch(webhookURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          alert(`สั่งซื้อยศ ${role} สำเร็จ!\nเลขสินค้า: #${orderNumber}`);
+        } else {
+          alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+        }
+      } catch (error) {
+        alert("ไม่สามารถเชื่อมต่อกับ Webhook ได้");
+        console.error(error);
+      }
+    }
   </script>
 </body>
 </html>
