@@ -1,115 +1,204 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ซื้อยศ Discord</title>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สมัครแข่ง Free Fire - ทีม</title>
+<style>
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #4b6cb7, #182848);
-      color: white;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0b0f1a;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        background: #141b2d;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(255,204,0,0.4);
     }
     h1 {
-      margin: 20px 0;
-      font-size: 2rem;
+        text-align: center;
+        color: #ffcc00;
+        margin-bottom: 15px;
+        font-size: 22px;
     }
-    .card {
-      background: rgba(255,255,255,0.1);
-      padding: 20px;
-      margin: 20px auto;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    .announcement {
+        background: rgba(255,255,255,0.05);
+        border-left: 5px solid #ffcc00;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        line-height: 1.5;
     }
-    select, input {
-      padding: 12px;
-      border-radius: 5px;
-      border: none;
-      width: 100%;
-      margin-top: 10px;
-      font-size: 1rem;
+    label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+        color: #ffcc00;
+        font-size: 14px;
+    }
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 6px;
+        border: none;
+        font-size: 14px;
+    }
+    .player {
+        margin-top: 15px;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+    }
+    .player h3 {
+        margin: 0 0 8px;
+        color: #ffcc00;
+        font-size: 16px;
     }
     button {
-      padding: 12px;
-      width: 100%;
-      background-color: #7289da;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
-      margin-top: 15px;
-      font-size: 1rem;
-      transition: background 0.3s;
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px;
+        background-color: #ffcc00;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
     }
     button:hover {
-      background-color: #5b6eae;
+        background-color: #e6b800;
     }
-  </style>
+    #status {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #0f0;
+    }
+</style>
 </head>
 <body>
-  <h1>ซื้อยศ Discord</h1>
+<img src="https://i.ibb.co/7J6yJcjB/IMG-2158.jpg" 
+     alt="ประกาศการเล่น สกิล ในการแข่ง" 
+     style="width:100%; height:auto; display:block; margin:0 auto; border-radius:10px;">
+<div class="container">
+    <h1>สมัครแข่ง Free Fire - ทีม</h1>
 
-  <div class="card">
-    <h2>เลือกยศ</h2>
-    <select id="roleSelect">
-      <option value="VIP 1">⭐ VIP 1 - 130 บาท</option>
-		 <option value="VIP 2">⭐ VIP 2- 50 บาท</option>
-		 <option value="VIP 3">⭐ VIP 3- 77 บาท</option>
-		 <option value="PRO 1">⭐ PRO 1 - 99 บาท</option>
-		 <option value="PRO 2">⭐ PRO 1- 159 บาท</option>
-      <option value="VIP PRO 100">🛡️ MOD - 299 บาท</option>
-      <option value="ADMIN">👑 ADMIN - 499 บาท</option>
-    </select>
-    <input type="text" id="discordId" placeholder="ใส่ @ ชื่อดิส คุณ">
-    <button onclick="buyRole()">ซื้อยศ</button>
-  </div>
+    <div class="announcement">
+        📢 <b>ประกาศการแข่งขัน</b><br>
+        🚀 Free Fire E-Sports X วิทยาลัยเทคโนโลยีบ้านจั่น  
+เปิดรับสมัครทีมละ 5 คน สำรอง 1คน<br>
+        🏆 รางวัลรวม: 1000 บาท<br>
+        📅 วันแข่ง : รอประกาศ อีกที<br>
+        🎮 โดดแรก (รอประกาศ) โดดสอง (ถ้ามีทีม ครบ 12ทีม)
+    </div>
 
-  <script>
-    // ฟังก์ชันสุ่มเลขออเดอร์ (6 หลัก)
-    function generateOrderNumber() {
-      return Math.floor(100000 + Math.random() * 900000);
+    <form id="teamForm">
+        <label>ชื่อทีม</label>
+        <input type="text" name="teamName" required>
+
+        <label>ลิงก์ / รูปโลโก้ทีม</label>
+        <input type="text" name="logoLink" placeholder="URL โลโก้ทีม">
+
+        <!-- ผู้เล่น 1-5 -->
+        <div class="player">
+            <h3>ผู้เล่น 1 (หัวหน้าทีม)</h3>
+            <label>ID เกม</label>
+            <input type="text" name="player1_id" required>
+            <label>ชื่อเล่น</label>
+            <input type="text" name="player1_nickname" required>
+        </div>
+
+        <div class="player">
+            <h3>ผู้เล่น 2</h3>
+            <label>ID เกม</label>
+            <input type="text" name="player2_id" required>
+            <label>ชื่อเล่น</label>
+            <input type="text" name="player2_nickname" required>
+        </div>
+
+        <div class="player">
+            <h3>ผู้เล่น 3</h3>
+            <label>ID เกม</label>
+            <input type="text" name="player3_id" required>
+            <label>ชื่อเล่น</label>
+            <input type="text" name="player3_nickname" required>
+        </div>
+
+        <div class="player">
+            <h3>ผู้เล่น 4</h3>
+            <label>ID เกม</label>
+            <input type="text" name="player4_id" required>
+            <label>ชื่อเล่น</label>
+            <input type="text" name="player4_nickname" required>
+        </div>
+
+        <div class="player">
+            <h3>ผู้เล่น 5สำรอง</h3>
+            <label>ID เกม</label>
+            <input type="text" name="player5_id" required>
+            <label>ชื่อเล่น</label>
+            <input type="text" name="player5_nickname" required>
+        </div>
+
+        <label>ลิงก์ Facebook / ID Line (สำหรับติดต่อ)</label>
+        <input type="text" name="contact" required>
+			<label>ฝากบอกผู้จัดแข่ง</label>
+        <input type="text" name="contact" required>
+
+        <button type="submit">ส่งใบสมัคร</button>
+    </form>
+
+    <p id="status"></p>
+			
+</div>
+<img src="https://i.ibb.co/0RG3vTpk/5224213c3fbff35ce845256e1e7c3260.jpg" 
+     alt="ประกาศการเล่น สกิล ในการแข่ง" 
+     style="width:100%; height:auto; display:block; margin:0 auto; border-radius:10px;">
+
+<br>
+<h4>⚠️ ห้าม กดส่งเล่น ถ้า ไม่ลง จริงๆ</h4>
+ติดต่อผู้จัดได้ที่ FB: Dev sun
+
+<script>
+document.getElementById("teamForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    // ข้อความที่จะส่งไป Discord
+    let content = `📢 **ใบสมัครทีม Free Fire**\n`;
+    content += `👥 ทีม: ${data.teamName}\n`;
+    content += `🖼 โลโก้: ${data.logoLink}\n\n`;
+    for (let i = 1; i <= 5; i++) {
+        content += `👤 ผู้เล่น ${i}: ${data[`player${i}_nickname`]} (ID: ${data[`player${i}_id`]})\n`;
     }
+    content += `\n📞 ติดต่อ: ${data.contact}`;
 
-    async function buyRole() {
-      const role = document.getElementById('roleSelect').value;
-      const discordId = document.getElementById('discordId').value.trim();
-
-      if (!discordId) {
-        alert('กรุณาใส่ Discord ID ของคุณ');
-        return;
-      }
-
-      // ✅ ใส่ Webhook ของคุณตรงนี้
-      const webhookURL = "https://discord.com/api/webhooks/1408036982017495050/aB8jhBAH15_TEhVnRksxuc0Hvljerzgnfn7OJoA3voJJQ5ogXty9r_Eeiif-SnBh8nIY";
-
-      const orderNumber = generateOrderNumber();
-
-      const payload = {
-        content: `🛒 **คำสั่งซื้อใหม่**\n👤 ลูกค้า: ${discordId}\n🎖️ ยศที่ซื้อ: ${role}\n📦 เลขสินค้า: #${orderNumber}`
-      };
-
-      try {
-        const response = await fetch(webhookURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+    try {
+        const res = await fetch("https://discord.com/api/webhooks/1413144381904388096/_WcvQmgZfQC6_CGAKRy-Q7rigHONvzqpAiy-Qbs7MPHDWkQ-4ybn3qFdVeOaBuOjeLgV", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ content })
         });
 
-        if (response.ok) {
-          alert(`สั่งซื้อยศ ${role} สำเร็จ!\nเลขสินค้า: #${orderNumber}`);
+        if (res.ok) {
+            document.getElementById("status").innerText = "✅ ส่งใบสมัครเรียบร้อย!";
+            this.reset();
         } else {
-          alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+            document.getElementById("status").innerText = "❌ ส่งไม่สำเร็จ";
         }
-      } catch (error) {
-        alert("ไม่สามารถเชื่อมต่อกับ Webhook ได้");
-        console.error(error);
-      }
+    } catch (err) {
+        document.getElementById("status").innerText = "⚠️ เกิดข้อผิดพลาด";
     }
-  </script>
+});
+</script>
 </body>
 </html>
