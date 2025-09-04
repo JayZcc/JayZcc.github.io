@@ -111,7 +111,9 @@
         <div class="player">
             <h3>ผู้เล่น 1 (หัวหน้าทีม)</h3>
             <label>รหัสนักศึกษา</label>
-            <input type="text" name="player1_id" required>
+            <input type="text" name="player1_student_id" required>
+            <label>UID เกม</label>
+            <input type="text" name="player1_uid" required>
             <label>ชื่อเล่น</label>
             <input type="text" name="player1_nickname" required>
         </div>
@@ -119,7 +121,9 @@
         <div class="player">
             <h3>ผู้เล่น 2</h3>
             <label>รหัสนักศึกษา</label>
-            <input type="text" name="player2_id" required>
+            <input type="text" name="player2_student_id" required>
+            <label>UID เกม</label>
+            <input type="text" name="player2_uid" required>
             <label>ชื่อเล่น</label>
             <input type="text" name="player2_nickname" required>
         </div>
@@ -127,7 +131,9 @@
         <div class="player">
             <h3>ผู้เล่น 3</h3>
             <label>รหัสนักศึกษา</label>
-            <input type="text" name="player3_id" required>
+            <input type="text" name="player3_student_id" required>
+            <label>UID เกม</label>
+            <input type="text" name="player3_uid" required>
             <label>ชื่อเล่น</label>
             <input type="text" name="player3_nickname" required>
         </div>
@@ -135,23 +141,31 @@
         <div class="player">
             <h3>ผู้เล่น 4</h3>
             <label>รหัสนักศึกษา</label>
-            <input type="text" name="player4_id" required>
+            <input type="text" name="player4_student_id" required>
+            <label>UID เกม</label>
+            <input type="text" name="player4_uid" required>
             <label>ชื่อเล่น</label>
             <input type="text" name="player4_nickname" required>
         </div>
 
         <div class="player">
-            <h3>ผู้เล่น 5สำรอง</h3>
+            <h3>ผู้เล่น 5 (สำรอง)</h3>
             <label>รหัสนักศึกษา</label>
-            <input type="text" name="player5_id" required>
+            <input type="text" name="player5_student_id" required>
+            <label>UID เกม</label>
+            <input type="text" name="player5_uid" required>
             <label>ชื่อเล่น</label>
             <input type="text" name="player5_nickname" required>
         </div>
 
-        <label>ลิงก์ Facebook / ID Line (สำหรับติดต่อ)</label>
-        <input type="text" name="contact" required>
-			<label>ฝากบอกผู้จัดแข่ง</label>
-        <input type="text" name="contact" required>
+        <label>Facebook URL</label>
+        <input type="text" name="contact_facebook" placeholder="ลิงก์ Facebook">
+
+        <label>Line ID</label>
+        <input type="text" name="contact_line" placeholder="ID Line">
+
+        <label>ฝากบอกผู้จัดแข่ง</label>
+        <input type="text" name="contact_note" placeholder="ข้อความถึงผู้จัด">
 
         <button type="submit">ส่งใบสมัคร</button>
     </form>
@@ -174,14 +188,19 @@ document.getElementById("teamForm").addEventListener("submit", async function(e)
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
 
-    // ข้อความที่จะส่งไป Discord
     let content = `📢 **ใบสมัครทีม Free Fire**\n`;
     content += `👥 ทีม: ${data.teamName}\n`;
     content += `🖼 โลโก้: ${data.logoLink}\n\n`;
+
     for (let i = 1; i <= 5; i++) {
-        content += `👤 ผู้เล่น ${i}: ${data[`player${i}_nickname`]} (ID: ${data[`player${i}_id`]})\n`;
+        const nickname = data[`player${i}_nickname`] || "ว่าง";
+        const studentId = data[`player${i}_student_id`] || "ว่าง";
+        const uid = data[`player${i}_uid`] || "ว่าง";
+        content += `👤 ผู้เล่น ${i}: ${nickname} (รหัส: ${studentId}, UID: ${uid})\n`;
     }
-    content += `\n📞 ติดต่อ: ${data.contact}`;
+
+    content += `\n📞 ติดต่อ:\nFacebook: ${data.contact_facebook || '-'}\nLine: ${data.contact_line || '-'}\n`;
+    content += `💬 ฝากข้อความ: ${data.contact_note || '-'}`;
 
     try {
         const res = await fetch("https://discord.com/api/webhooks/1413144381904388096/_WcvQmgZfQC6_CGAKRy-Q7rigHONvzqpAiy-Qbs7MPHDWkQ-4ybn3qFdVeOaBuOjeLgV", {
